@@ -21,14 +21,14 @@ jobs:
       - name: Parse regions
         id: set-matrix
         run: |
-          echo "[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/","/g')\"]" >> $GITHUB_OUTPUT
+          echo "regions=[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/","/g')\"]" >> $GITHUB_OUTPUT
           echo $GITHUB_OUTPUT
   deploy:
     runs-on: ubuntu-latest
     needs: gets-regions
     strategy:
       matrix:
-        region: ${{ fromJson(needs.gets-regions.outputs.matrix-region) }}
+        region: ${{ fromJson(needs.gets-regions.outputs.matrix-region).regions }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
