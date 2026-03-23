@@ -42,9 +42,7 @@ jobs:
         with:
           role-to-assume: ${{ inputs.OIDCRoleARN }}
           aws-region: ${{ matrix.region }}
-          duration-seconds: 900
+          role-duration-seconds: 900
 
-      - name: Deploy to AWS
-        run: |
-          echo "Deploying application to AWS in region ${{ matrix.region }}..."
-          # Add your deployment commands here, e.g., using AWS CLI or CDK
+      - name: verify AWS credentials
+        run: aws sts get-caller-identity
