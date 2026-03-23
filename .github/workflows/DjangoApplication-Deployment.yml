@@ -1,0 +1,25 @@
+name: Djano Application Deployment
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  Dev:
+    if: github.event_name == 'pull_request' && ( github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.action == 'reopened' )
+    uses: ./.github/workflows/aws-deployment-flow.yml@main
+    with:
+      OIDCRoleARN: "arn:aws:iam::535002890860:role/Dev-GitHub-Action-Deployer-Role"
+      AWSRegion: 'us-east-1'
+  Prod:
+    if: github.event_name == 'pull_request' &&  github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/aws-deployment-flow.yml@main
+    with:
+      OIDCRoleARN: "arn:aws:iam::535002890860:role/GitHub-Action-Deployer-Role"
+      AWSRegion: 'us-east-1'

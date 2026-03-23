@@ -1,0 +1,44 @@
+name: AWS Deployment Flow
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      OIDCRoleARN:
+        description: 'OIDC Role ARN for AWS authentication'
+        required: true
+        type: string
+      AWSRegion:
+        description: 'AWS Region for deployment'
+        required: true
+        type: string
+        default: 'us-east-1'
+jobs:
+  gets-regions:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix-region: ${{ steps.set-matrix.outputs.regions }}
+    steps:
+      - name: Parse regions
+        id: set-matrix
+        run: |
+          echo "regions=[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/","/g')\"]" >> $GITHUB_OUTPUT
+  deploy:
+    runs-on: ubuntu-latest
+    needs: gets-regions
+    strategy:
+      matrix:
+        region: ${{ fromJson(needs.gets-regions.outputs.matrix-region).regions }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ inputs.OIDCRoleARN }}
+          aws-region: ${{ matrix.region }}
+
+      - name: Deploy to AWS
+        run: |
+          echo "Deploying application to AWS in region ${{ matrix.region }}..."
+          # Add your deployment commands here, e.g., using AWS CLI or CDK
