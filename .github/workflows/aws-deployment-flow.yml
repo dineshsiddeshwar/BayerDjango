@@ -54,18 +54,18 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        # with:
+        #   terraform_version: 1.7.0
+        #   cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       
       - name: Terraform Init
         run: terraform init -backend-config=terraform.${{ inputs.env }}.tfbackend
-        working-directory: Terraform
-        env:
-          TF_CLOUD_ORGANIZATION: "BayerApplication"
-          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+        # working-directory: Terraform
         # env:
-        #   TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+        #   TF_CLOUD_ORGANIZATION: "BayerApplication"
+        #   TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
       # - name: Select Workspace
       #   run: |
