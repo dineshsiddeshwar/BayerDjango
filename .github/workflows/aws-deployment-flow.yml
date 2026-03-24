@@ -62,15 +62,15 @@ jobs:
       #   run: terraform login
       #   env:
       #     TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Terraform Init
+        run: terraform init -backend-config=backend-${{ inputs.env }}.tf
+        working-directory: Terraform
 
       - name: Select Workspace
         run: |
           terraform workspace select django-${{ inputs.env }} || \
           terraform workspace new django-${{ inputs.env }}
-        working-directory: Terraform
-
-      - name: Terraform Init
-        run: terraform init -backend-config=backend-${{ inputs.env }}.tf
         working-directory: Terraform
 
       - name: Terraform Validate
