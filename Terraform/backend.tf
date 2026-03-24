@@ -6,5 +6,11 @@ terraform {
 		}
 	}
 
-	backend "remote" { }
+	backend "remote" { 
+		hostname = "app.terraform.io"
+		organization = "BayerApplication"
+		workspaces {
+			name = "Bayer${var.env}"
+		}
+}
 }
