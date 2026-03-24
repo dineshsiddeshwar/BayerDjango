@@ -176,23 +176,16 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 🔐 Terraform Cloud Authentication
-      - name: Terraform Cloud Login
-        run: |
-          mkdir -p ~/.terraform.d
-          cat <<EOF > ~/.terraform.d/credentials.tfrc.json
-          {
-            "credentials": {
-              "app.terraform.io": {
-                "token": "${{ secrets.TF_API_TOKEN }}"
-              }
-            }
-          }
-          EOF
+      - name: Set Terraform Cloud Token
+        run: echo "Terraform Cloud token configured"
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init (Terraform Cloud)
         run: terraform init -backend-config=terraform-${{ inputs.env }}.tfbackend
         working-directory: Terraform
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
