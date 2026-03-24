@@ -74,7 +74,7 @@ jobs:
       - name: Deploy App via SSM
         run: |
           echo "Waiting for EC2 instance to be available in SSM..."
-
+          sleep 20
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=${{ matrix.env }}-django" \
             --query "Reservations[].Instances[].InstanceId" \
@@ -114,5 +114,3 @@ jobs:
             --output text)
 
           echo "Command ID: $COMMAND_ID"
-
-          aws ssm wait command-executed --command-id $COMMAND_ID

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bayer
 yum update -y
-yum install -y python3 git
+yum install -y python3 git, python3-pip
 
 pip3 install --upgrade pip
 pip3 install django
