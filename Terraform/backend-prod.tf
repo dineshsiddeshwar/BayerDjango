@@ -4,7 +4,7 @@ terraform {
     organization = "BayerApplication"
 
     workspaces {
-      prefix = "django-"
+      prefix = "django-prod"
     }
   }
 }

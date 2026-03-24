@@ -67,11 +67,11 @@ jobs:
         run: terraform init -backend-config=backend-${{ inputs.env }}.tf
         working-directory: Terraform
 
-      - name: Select Workspace
-        run: |
-          terraform workspace select django-${{ inputs.env }} || \
-          terraform workspace new django-${{ inputs.env }}
-        working-directory: Terraform
+      # - name: Select Workspace
+      #   run: |
+      #     terraform workspace select django-${{ inputs.env }} || \
+      #     terraform workspace new django-${{ inputs.env }}
+      #   working-directory: Terraform
 
       - name: Terraform Validate
         run: terraform validate
