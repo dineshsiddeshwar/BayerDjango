@@ -1,4 +1,4 @@
-name: Djano Application Deployment
+name: Djano Application Deployment.
 on:
   pull_request:
     branches:
