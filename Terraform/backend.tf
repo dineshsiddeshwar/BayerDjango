@@ -10,7 +10,7 @@ terraform {
 		hostname = "app.terraform.io"
 		organization = "BayerApplication"
 		workspaces {
-			name = "Bayer${var.env}"
+			name = "Bayerdev"
 		}
 }
 }
