@@ -57,21 +57,12 @@ jobs:
         with:
           terraform_version: 1.7.0
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      # - name: Terraform Login
-      #   run: terraform login
-      #   env:
-      #     TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
       
       - name: Terraform Init
         run: terraform init -backend-config=terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
-
-      # - name: Select Workspace
-      #   run: |
-      #     terraform workspace select django-${{ inputs.env }} || \
-      #     terraform workspace new django-${{ inputs.env }}
-      #   working-directory: Terraform
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
