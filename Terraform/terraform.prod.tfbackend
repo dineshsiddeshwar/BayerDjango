@@ -1,0 +1,4 @@
+# config.remote.tfbackend
+workspaces { name = "BayerProd" }
+hostname     = "app.terraform.io"
+organization = "BayerApplication"

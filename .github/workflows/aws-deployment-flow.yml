@@ -64,7 +64,7 @@ jobs:
       #     TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
       
       - name: Terraform Init
-        run: terraform init -backend-config=backend-${{ inputs.env }}.tf
+        run: terraform init -backend-config=terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
 
       # - name: Select Workspace
