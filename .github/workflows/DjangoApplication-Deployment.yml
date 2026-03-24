@@ -18,9 +18,11 @@ jobs:
     with:
       OIDCRoleARN: "arn:aws:iam::535002890860:role/Dev-GitHub-Action-Deployer-Role"
       AWSRegion: us-east-1
+      env: dev
   Prod:
     if: github.event_name == 'pull_request' &&  github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     uses: ./.github/workflows/aws-deployment-flow.yml
     with:
       OIDCRoleARN: "arn:aws:iam::535002890860:role/GitHub-Action-Deployer-Role"
       AWSRegion: us-east-1
+      env: prod
