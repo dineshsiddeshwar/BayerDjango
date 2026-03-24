@@ -59,8 +59,11 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config=terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
+        env:
+          TF_CLOUD_ORGANIZATION: "BayerApplication"
+          TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
         # env:
         #   TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
