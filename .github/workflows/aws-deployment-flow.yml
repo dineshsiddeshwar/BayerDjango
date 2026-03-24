@@ -154,7 +154,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: gets-regions
-
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
     strategy:
       matrix:
         region: ${{ fromJson(needs.gets-regions.outputs.matrix-region)}}
@@ -176,16 +177,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Set Terraform Cloud Token
-        run: echo "Terraform Cloud token configured"
-        env:
-          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
-
       - name: Terraform Init (Terraform Cloud)
         run: terraform init -backend-config=terraform-${{ inputs.env }}.tfbackend
         working-directory: Terraform
-        env:
-          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
