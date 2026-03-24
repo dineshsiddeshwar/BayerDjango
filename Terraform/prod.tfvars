@@ -1,6 +1,6 @@
 env              = "prod"
 region           = "us-east-1"
-ami              = "ami-xxxx"
+ami              = "ami-0b09ffb6d8b58ca91"
 instance_type    = "t3.small"
 
 desired_capacity = 1

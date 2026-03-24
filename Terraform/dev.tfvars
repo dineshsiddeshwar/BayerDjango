@@ -1,6 +1,6 @@
 env              = "dev"
 region           = "us-east-1"
-ami              = "ami-xxxx"
+ami              = "ami-0b09ffb6d8b58ca91"
 instance_type    = "t2.micro"
 
 desired_capacity = 1
