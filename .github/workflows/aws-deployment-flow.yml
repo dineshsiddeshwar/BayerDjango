@@ -190,11 +190,11 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -var-file="${{ github.workspace }}/Terraform/${{ inputs.env }}.tfvars"
-        # working-directory: Terraform
+        working-directory: ${{ github.workspace }}/Terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file="${{ github.workspace }}/Terraform/${{ inputs.env }}.tfvars"
-        # working-directory: Terraform
+        working-directory: ${{ github.workspace }}/Terraform
 
       - name: Deploy App via SSM
         run: |
