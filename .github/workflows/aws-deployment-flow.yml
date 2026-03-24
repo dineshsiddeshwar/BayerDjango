@@ -181,7 +181,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init (Terraform Cloud)
-        run: terraform init -backend-config="Terraform/terraform.${{ inputs.env }}.tfbackend"
+        run: terraform init -backend-config="terraform.${{ inputs.env }}.tfbackend"
         working-directory: Terraform
 
       - name: Terraform Validate
