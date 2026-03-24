@@ -73,16 +73,46 @@ jobs:
       
       - name: Deploy App via SSM
         run: |
+          echo "Waiting for EC2 instance to be available in SSM..."
+
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=${{ matrix.env }}-django" \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+
+          echo "Instance ID: $INSTANCE_ID"
+
+          # Wait until instance is registered in SSM and online
+          while true; do
+            STATUS=$(aws ssm describe-instance-information \
+              --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+              --query "InstanceInformationList[0].PingStatus" \
+              --output text 2>/dev/null)
+
+            if [ "$STATUS" = "Online" ]; then
+              echo "Instance is online in SSM ✅"
+              break
+            fi
+
+            echo "Waiting for SSM agent..."
+            sleep 10
+          done
+
+          echo "Running deployment command..."
+
           COMMAND_ID=$(aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=tag:Name,Values=${{ matrix.env }}-django" \
-            --parameters commands='[
-              "cd /home/ec2-user/BayerProject",
-              "git pull origin main",
-              "sudo systemctl restart django"
-            ]' \
+            --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
+            --parameters commands="[
+              \"cd /home/ec2-user/BayerProject\",
+              \"git fetch origin\",
+              \"git checkout ${{ github.ref_name }}\",
+              \"git pull origin ${{ github.ref_name }}\",
+              \"sudo systemctl restart django\"
+            ]" \
             --query "Command.CommandId" \
             --output text)
 
           echo "Command ID: $COMMAND_ID"
+
           aws ssm wait command-executed --command-id $COMMAND_ID

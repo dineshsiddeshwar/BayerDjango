@@ -23,7 +23,7 @@ After=network.target
 [Service]
 User=ec2-user
 WorkingDirectory=/home/ec2-user/BayerProject/BayerProject
-ExecStart=/usr/bin/python3 manage.py runserver 0.0.0.0:8000
+ExecStart=/usr/bin/python3 /home/ec2-user/BayerProject/BayerProject/manage.py runserver 0.0.0.0:8000
 Restart=always
 
 [Install]
