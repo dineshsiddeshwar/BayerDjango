@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ec2_role" {
-  name = "Bayer-${var.env}-ec2-role-${var.region}"
+  name = "${var.env}-${var.region}-ec2-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,6 +19,6 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 }
 
 resource "aws_iam_instance_profile" "profile" {
-  name = "Bayer-${var.env}-ec2-profile-${var.region}"
+  name = "${var.env}-${var.region}-ec2-profile"
   role = aws_iam_role.ec2_role.name
 }
