@@ -1,4 +1,122 @@
+# name: AWS Deployment Flow
+# on:
+#   workflow_dispatch:
+#   workflow_call:
+#     inputs:
+#       OIDCRoleARN:
+#         description: 'OIDC Role ARN for AWS authentication'
+#         required: true
+#         type: string
+#       AWSRegion:
+#         description: 'AWS Region for deployment'
+#         required: true
+#         type: string
+#         default: 'us-east-1'
+#       env:
+#         description: 'Environment for deployment'
+#         required: true
+#         type: string
+#         default: 'dev'
+
+# permissions:
+#   id-token: write
+#   contents: read
+# jobs:
+#   gets-regions:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       matrix-region: ${{ steps.set-matrix.outputs.regions }}
+#     steps:
+#       - name: Parse regions
+#         id: set-matrix
+#         run: |
+#           echo "regions=[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/","/g')\"]" >> $GITHUB_OUTPUT
+#           echo $GITHUB_OUTPUT
+#   deploy:
+#     runs-on: ubuntu-latest
+#     needs: gets-regions
+#     strategy:
+#       matrix:
+#         region: ${{ fromJson(needs.gets-regions.outputs.matrix-region)}}
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: ${{ inputs.OIDCRoleARN }}
+#           aws-region: ${{ matrix.region }}
+#           role-duration-seconds: 900
+
+#       - name: verify AWS credentials
+#         run: aws sts get-caller-identity
+
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+      
+#       - name: Terraform Init
+#         run: terraform init
+#         working-directory: Terraform
+
+#       - name: Terraform Validate
+#         run: terraform validate
+#         working-directory: Terraform
+
+#       - name: Terraform Plan
+#         run: terraform plan -var-file="${{ inputs.env }}.tfvars"
+#         working-directory: Terraform
+
+#       - name: Terraform Apply
+#         run: terraform apply -auto-approve -var-file="${{ inputs.env }}.tfvars"
+#         working-directory: Terraform
+      
+#       - name: Deploy App via SSM
+#         run: |
+#           echo "Waiting for EC2 instance to be available in SSM..."
+#           sleep 20
+#           INSTANCE_ID=$(aws ec2 describe-instances \
+#             --filters "Name=tag:Name,Values=${{ inputs.env }}-django" "Name=instance-state-name,Values=running" \
+#             --query "Reservations[].Instances[].InstanceId" \
+#             --output text)
+
+#           echo "Instance ID: $INSTANCE_ID"
+
+#           # Wait until instance is registered in SSM and online
+#           while true; do
+#             STATUS=$(aws ssm describe-instance-information \
+#               --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+#               --query "InstanceInformationList[0].PingStatus" \
+#               --output text 2>/dev/null)
+
+#             if [ "$STATUS" = "Online" ]; then
+#               echo "Instance is online in SSM ✅"
+#               break
+#             fi
+
+#             echo "Waiting for SSM agent..."
+#             sleep 10
+#           done
+
+#           echo "Running deployment command..."
+
+#           COMMAND_ID=$(aws ssm send-command \
+#             --document-name "AWS-RunShellScript" \
+#             --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
+#             --parameters commands="[
+#               \"cd /home/ec2-user/BayerProject\",
+#               \"git fetch origin\",
+#               \"git checkout ${{ github.ref_name }}\",
+#               \"git pull origin ${{ github.ref_name }}\",
+#               \"sudo systemctl restart django\"
+#             ]" \
+#             --query "Command.CommandId" \
+#             --output text)
+
+#           echo "Command ID: $COMMAND_ID"
+
 name: AWS Deployment Flow
+
 on:
   workflow_dispatch:
   workflow_call:
@@ -21,6 +139,7 @@ on:
 permissions:
   id-token: write
   contents: read
+
 jobs:
   gets-regions:
     runs-on: ubuntu-latest
@@ -30,14 +149,16 @@ jobs:
       - name: Parse regions
         id: set-matrix
         run: |
-          echo "regions=[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/","/g')\"]" >> $GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
+          echo "regions=[\"$(echo '${{ inputs.AWSRegion }}' | sed 's/,/\",\"/g')\"]" >> $GITHUB_OUTPUT
+
   deploy:
     runs-on: ubuntu-latest
     needs: gets-regions
+
     strategy:
       matrix:
         region: ${{ fromJson(needs.gets-regions.outputs.matrix-region)}}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -49,14 +170,28 @@ jobs:
           aws-region: ${{ matrix.region }}
           role-duration-seconds: 900
 
-      - name: verify AWS credentials
+      - name: Verify AWS credentials
         run: aws sts get-caller-identity
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-      
-      - name: Terraform Init
-        run: terraform init
+
+      # 🔐 Terraform Cloud Authentication
+      - name: Terraform Cloud Login
+        run: |
+          mkdir -p ~/.terraform.d
+          cat <<EOF > ~/.terraform.d/credentials.tfrc.json
+          {
+            "credentials": {
+              "app.terraform.io": {
+                "token": "${{ secrets.TF_API_TOKEN }}"
+              }
+            }
+          }
+          EOF
+
+      - name: Terraform Init (Terraform Cloud)
+        run: terraform init -backend-config=terraform-${{ inputs.env }}.tfbackend
         working-directory: Terraform
 
       - name: Terraform Validate
@@ -70,11 +205,12 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file="${{ inputs.env }}.tfvars"
         working-directory: Terraform
-      
+
       - name: Deploy App via SSM
         run: |
           echo "Waiting for EC2 instance to be available in SSM..."
           sleep 20
+
           INSTANCE_ID=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=${{ inputs.env }}-django" "Name=instance-state-name,Values=running" \
             --query "Reservations[].Instances[].InstanceId" \
@@ -82,7 +218,6 @@ jobs:
 
           echo "Instance ID: $INSTANCE_ID"
 
-          # Wait until instance is registered in SSM and online
           while true; do
             STATUS=$(aws ssm describe-instance-information \
               --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
