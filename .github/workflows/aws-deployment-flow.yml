@@ -182,11 +182,11 @@ jobs:
 
       - name: Terraform Init (Terraform Cloud)
         run: terraform init -backend-config="Terraform/terraform.${{ inputs.env }}.tfbackend"
-        # working-directory: Terraform
+        working-directory: Terraform
 
       - name: Terraform Validate
         run: terraform validate
-        # working-directory: Terraform
+        working-directory: Terraform
 
       - name: Terraform Plan
         run: terraform plan -var-file="${{ inputs.env }}.tfvars"
