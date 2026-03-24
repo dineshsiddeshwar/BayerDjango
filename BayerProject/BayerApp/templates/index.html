@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dinesh Siddeshwar | AWS Cloud Architect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0f1c;
+      color: #fff;
+      scroll-behavior: smooth;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+    }
+
+    section {
+      padding: 80px 10%;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    /* HERO */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      background: radial-gradient(circle at top, #111a33, #05070f);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #aaa;
+      max-width: 600px;
+    }
+
+    .btn {
+      margin-top: 30px;
+      display: inline-block;
+      padding: 12px 24px;
+      background: #0072ff;
+      color: #fff;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #0056d6;
+      transform: scale(1.05);
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      gap: 30px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: #111a33;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat h2 {
+      color: #00c6ff;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 28px;
+      margin-bottom: 40px;
+      border-left: 4px solid #00c6ff;
+      padding-left: 10px;
+    }
+
+    /* CARDS */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #111a33;
+      padding: 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      background: #162347;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: #00c6ff;
+    }
+
+    /* EXPERIENCE */
+    .timeline {
+      border-left: 2px solid #00c6ff;
+      padding-left: 20px;
+    }
+
+    .timeline-item {
+      margin-bottom: 30px;
+    }
+
+    .timeline-item h3 {
+      color: #00c6ff;
+    }
+
+    .timeline-item span {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    /* CONTACT */
+    .contact {
+      text-align: center;
+    }
+
+    .contact a {
+      display: inline-block;
+      margin: 10px;
+      color: #00c6ff;
+      text-decoration: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1>Dinesh Siddeshwar</h1>
+    <h3>AWS Cloud Architect & Automation Engineer</h3>
+
+    <p>
+      I design secure, scalable, and automated cloud platforms on AWS.
+      From managing 40,000+ instances to building enterprise-grade automation,
+      I turn complex cloud challenges into efficient systems.
+    </p>
+
+    <a href="#contact" class="btn">Hire Me</a>
+
+    <div class="stats">
+      <div class="stat">
+        <h2>40,000+</h2>
+        <p>Instances Managed</p>
+      </div>
+      <div class="stat">
+        <h2>30,000+</h2>
+        <p>Hours Saved</p>
+      </div>
+      <div class="stat">
+        <h2>6+ Years</h2>
+        <p>Experience</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Key Achievements</h2>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Security Automation</h3>
+        <p>Automated remediation using Orca, Wiz & InsightCloudSec with zero disruption.</p>
+      </div>
+
+      <div class="card">
+        <h3>Incident Response</h3>
+        <p>Built EC2 isolation workflows with approval systems for critical incidents.</p>
+      </div>
+
+      <div class="card">
+        <h3>Cost Optimization</h3>
+        <p>Developed cross-region scheduler for EC2 & RDS to optimize costs globally.</p>
+      </div>
+
+      <div class="card">
+        <h3>Mass Automation</h3>
+        <p>Automated deployment of agents across 40,000+ instances.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Skills</h2>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Cloud</h3>
+        <p>AWS (EC2, Lambda, S3, VPC, IAM, RDS, DynamoDB)</p>
+      </div>
+
+      <div class="card">
+        <h3>DevOps</h3>
+        <p>Terraform, CloudFormation, GitHub Actions</p>
+      </div>
+
+      <div class="card">
+        <h3>Security</h3>
+        <p>Wiz, Orca, Qualys, IAM, SCP</p>
+      </div>
+
+      <div class="card">
+        <h3>Programming</h3>
+        <p>Python, Shell Scripting</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Experience</h2>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h3>EY GDS</h3>
+        <span>Senior Consultant (2024 - Present)</span>
+        <p>Led automation, security remediation, and large-scale AWS operations.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3>Accenture</h3>
+        <span>Application Development Analyst</span>
+        <p>Built CI/CD pipelines and serverless automation systems.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h3>Infosys</h3>
+        <span>Senior Operations Executive</span>
+        <p>Managed AWS infrastructure and implemented monitoring & automation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="container">
+    <h2 class="section-title">Let's Work Together</h2>
+
+    <p>Let’s build scalable, secure, and automated cloud solutions.</p>
+
+    <a href="mailto:dineshks814@gmail.com">📧 Email</a>
+    <a href="tel:+918123098669">📞 Call</a>
+    <a href="#">💻 GitHub</a>
+    <a href="#">🔗 LinkedIn</a>
+  </div>
+</section>
+
+<footer>
+  © 2026 Dinesh Siddeshwar | AWS Cloud Architect
+</footer>
+
+</body>
+</html>

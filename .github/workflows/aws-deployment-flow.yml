@@ -12,6 +12,11 @@ on:
         required: true
         type: string
         default: 'us-east-1'
+      env:
+        description: 'Environment for deployment'
+        required: true
+        type: string
+        default: 'dev'
 
 permissions:
   id-token: write
@@ -46,3 +51,49 @@ jobs:
 
       - name: verify AWS credentials
         run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Login
+        run: terraform login
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Select Workspace
+        run: |
+          terraform workspace select django-${{ inputs.env }} || \
+          terraform workspace new django-${{ inputs.env }}
+        working-directory: Terraform
+
+      - name: Terraform Init
+        run: terraform init -backend-config=backend-${{ inputs.env }}.tf
+        working-directory: Terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: Terraform
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="${{ inputs.env }}.tfvars"
+        working-directory: Terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var-file="${{ inputs.env }}.tfvars"
+        working-directory: Terraform
+      
+      - name: Deploy App via SSM
+        run: |
+          COMMAND_ID=$(aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Name,Values=${{ matrix.env }}-django" \
+            --parameters commands='[
+              "cd /home/ec2-user/BayerProject",
+              "git pull origin main",
+              "sudo systemctl restart django"
+            ]' \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "Command ID: $COMMAND_ID"
+          aws ssm wait command-executed --command-id $COMMAND_ID
