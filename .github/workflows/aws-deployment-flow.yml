@@ -52,6 +52,14 @@ jobs:
       - name: verify AWS credentials
         run: aws sts get-caller-identity
 
+      - name: Debug token presence
+        run: |
+          if [ -z "${{ secrets.TFC_API_TOKEN }}" ]; then
+            echo "Token is EMPTY"
+            exit 1
+          else
+            echo "Token is present"
+          fi
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
