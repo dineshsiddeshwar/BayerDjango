@@ -65,9 +65,9 @@ jobs:
           fi
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        # with:
-        #   terraform_version: 1.5.7
-        #   cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
+        with:
+          terraform_version: 1.5.7
+          cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
       
       # - name: Terraform Init
       #   run: terraform init
@@ -76,8 +76,8 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config=${{github.workspace}}/Terraform/terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
-        env:
-          TF_TOKEN_app_terraform_io: ${{ secrets.TFC_API_TOKEN }}
+        # env:
+        #   TF_TOKEN_app_terraform_io: ${{ secrets.TFC_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
