@@ -81,6 +81,23 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: Terraform
       
+      - name: Get the Code
+        id: set-branch
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ] && \
+            [ "${{ github.event.action }}" == "closed" ] && \
+            [ "${{ github.event.pull_request.merged }}" == "true" ] && \
+            [ "${{ github.event.pull_request.base.ref }}" == "main" ]; then
+            # PR merged to main → deploy main
+            echo "BRANCH_TO_DEPLOY=main" >> $GITHUB_ENV
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            # Open PR → deploy feature branch
+            echo "BRANCH_TO_DEPLOY=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          else
+            # Default fallback
+            echo "BRANCH_TO_DEPLOY=main" >> $GITHUB_ENV
+          fi
+
       - name: Deploy App via SSM
         run: |
           echo "Waiting for EC2 instance to be available in SSM..."
@@ -108,20 +125,21 @@ jobs:
             sleep 10
           done
 
+          
           echo "Running deployment command..."
-          echo "Deploy branch ${{ github.event.pull_request.head.ref }}"
+          echo "Deploy branch $BRANCH_TO_DEPLOY"
           COMMAND_ID=$(aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
             --parameters commands="[
               \"cd /home/ec2-user/BayerProject\",
               \"git fetch origin\",
-              \"git checkout ${{ github.event.pull_request.head.ref }}\",
-              \"git pull origin ${{ github.event.pull_request.head.ref }}\",
+              \"git checkout $BRANCH_TO_DEPLOY\",
+              \"git pull origin $BRANCH_TO_DEPLOY\",
               \"sudo systemctl restart django\"
             ]" \
             --query "Command.CommandId" \
-            --comment "Deploy branch ${{ github.event.pull_request.head.ref }}" \
+            --comment "Deploy branch $BRANCH_TO_DEPLOY" \
             --output text)
 
           echo "Command ID: $COMMAND_ID"
