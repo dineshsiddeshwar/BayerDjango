@@ -2,4 +2,3 @@
 workspaces { name = "Bayerprod" }
 hostname     = "app.terraform.io"
 organization = "BayerApplication"
-operations = false 
