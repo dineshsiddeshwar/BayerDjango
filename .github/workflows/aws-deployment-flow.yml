@@ -64,15 +64,10 @@ jobs:
       - name: Rename Var files
         run: |
           mv ${{github.workspace}}/Terraform/${{ inputs.env }}.tfvars Terraform/${{ inputs.env }}.auto.tfvars
-      # - name: Terraform Init
-      #   run: terraform init
-      #   working-directory: Terraform
 
       - name: Terraform Init
         run: terraform init -backend-config=${{github.workspace}}/Terraform/terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
-        # env:
-        #   TF_TOKEN_app_terraform_io: ${{ secrets.TFC_API_TOKEN }}
 
       - name: Terraform Validate
         run: terraform validate
@@ -105,7 +100,7 @@ jobs:
               --output text 2>/dev/null)
 
             if [ "$STATUS" = "Online" ]; then
-              echo "Instance is online in SSM ✅"
+              echo "Instance is online in SSM"
               break
             fi
 
