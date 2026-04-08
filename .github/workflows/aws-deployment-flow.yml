@@ -2,6 +2,9 @@ name: AWS Deployment Flow
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      TFC_API_TOKEN:
+        required: true
     inputs:
       OIDCRoleARN:
         description: 'OIDC Role ARN for AWS authentication'
@@ -54,9 +57,16 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-      
+        with:
+          terraform_version: 1.5.7
+          cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
+
+      - name: Rename Var files
+        run: |
+          mv ${{github.workspace}}/Terraform/${{ inputs.env }}.tfvars Terraform/${{ inputs.env }}.auto.tfvars
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config=${{github.workspace}}/Terraform/terraform.${{ inputs.env }}.tfbackend
         working-directory: Terraform
 
       - name: Terraform Validate
@@ -64,11 +74,11 @@ jobs:
         working-directory: Terraform
 
       - name: Terraform Plan
-        run: terraform plan -var-file="${{ inputs.env }}.tfvars"
+        run: terraform plan
         working-directory: Terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file="${{ inputs.env }}.tfvars"
+        run: terraform apply -auto-approve
         working-directory: Terraform
       
       - name: Deploy App via SSM
@@ -90,7 +100,7 @@ jobs:
               --output text 2>/dev/null)
 
             if [ "$STATUS" = "Online" ]; then
-              echo "Instance is online in SSM ✅"
+              echo "Instance is online in SSM"
               break
             fi
 
@@ -99,18 +109,19 @@ jobs:
           done
 
           echo "Running deployment command..."
-
+          echo "Deploy branch ${{ github.event.pull_request.head.ref }}"
           COMMAND_ID=$(aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=InstanceIds,Values=$INSTANCE_ID" \
             --parameters commands="[
               \"cd /home/ec2-user/BayerProject\",
               \"git fetch origin\",
-              \"git checkout ${{ github.ref_name }}\",
-              \"git pull origin ${{ github.ref_name }}\",
+              \"git checkout ${{ github.event.pull_request.head.ref }}\",
+              \"git pull origin ${{ github.event.pull_request.head.ref }}\",
               \"sudo systemctl restart django\"
             ]" \
             --query "Command.CommandId" \
+            --comment "Deploy branch ${{ github.event.pull_request.head.ref }}" \
             --output text)
 
           echo "Command ID: $COMMAND_ID"
