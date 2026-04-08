@@ -55,22 +55,12 @@ jobs:
       - name: verify AWS credentials
         run: aws sts get-caller-identity
 
-      # - name: Debug token presence
-      #   run: |
-      #     if [ -z "${{ secrets.TFC_API_TOKEN }}" ]; then
-      #       echo "Token is EMPTY"
-      #       exit 1
-      #     else
-      #       echo "Token is present"
-      #     fi
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
           cli_config_credentials_token: ${{ secrets.TFC_API_TOKEN }}
-      - name: Clean Terraform
-        run: rm -rf .terraform
-        working-directory: Terraform
+
       - name: Rename Var files
         run: |
           mv ${{github.workspace}}/Terraform/${{ inputs.env }}.tfvars Terraform/${{ inputs.env }}.auto.tfvars
